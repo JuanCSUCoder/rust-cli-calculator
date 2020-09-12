@@ -9,6 +9,30 @@ fn welcome(){
 fn remove_spaces(strexp: String) -> String {
     return strexp.replace(" ", "").replace("\n","");
 }
+
+fn parentheses(strexp: String) -> String {
+    return strexp
+        .replace("[","(")
+        .replace("{","(")
+        .replace("]",")")
+        .replace("}",")");
+}
+
+fn define_oper_order(expr: String) -> String {
+    // Order operations by operation order without including what is inside parethesis
+        // Remove Parentheses and change by letters
+        // Create an array of characters from the string
+        // Get the index of every operator
+        // Order every index according to the operation order
+        // Divide the indexes in groups according to the operation related
+        // Surround with parentheses the first index
+        // Repeat all the steps
+    // Create parentheses around first type operation
+    // Order operations by operation order without including what is inside parethesis
+    // Create parentheses around second type operation
+    // Repeat until ending
+    return expr;
+}
 fn main() {
     welcome();
     let mut expr = String::new();
@@ -27,6 +51,8 @@ fn main() {
         }
 
         expr = remove_spaces(expr);
+        expr = parentheses(expr);
+        expr = define_oper_order(expr);
         println!("{}", expr);
         
         // Clean variable data
