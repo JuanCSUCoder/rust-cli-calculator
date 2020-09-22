@@ -173,7 +173,9 @@ fn main() {
 
         expr = remove_spaces(expr);
         expr = parentheses(expr);
-        let operation = parse(expr);
+        let mut finalstr  = "0".to_string();
+        finalstr.push_str(&expr[..]);
+        let operation = parse(finalstr);
         println!("{}", operation.resolve());
         // Clean variable data
         expr = "".to_string();
