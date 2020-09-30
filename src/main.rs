@@ -168,7 +168,7 @@ fn parse(strexp: String) -> Operation {
                     && is_superior_than_first(
                         superior_operation_type.clone(),
                         to_operation(charlist[index]),
-                    )
+                    ) && level == 0
                 {
                     superior_operation_index = index;
                     superior_operation_type = to_operation(charlist[index]);
