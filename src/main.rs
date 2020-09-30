@@ -43,7 +43,10 @@ fn has_vanishable_parenthesis(str_to_check: String) -> bool {
         }
     }
 
-    if first_open_par_index == 0 && last_close_par_index == str_to_check.len() - 1 && str_to_check.len() != 1 {
+    if first_open_par_index == 0
+        && last_close_par_index == str_to_check.len() - 1
+        && str_to_check.len() != 1
+    {
         return true;
     } else {
         return false;
@@ -248,8 +251,14 @@ fn main() {
 
         expr = remove_spaces(expr);
         expr = parenthesis(expr);
-        let mut finalstr = "0".to_string();
-        finalstr.push_str(&expr[..]);
+        let mut finalstr;
+        let char_list: Vec<char> = expr.clone().chars().collect();
+        if has_operations(char_list[0].to_string()) {
+            finalstr = "0".to_string();
+            finalstr.push_str(&expr[..]);
+        } else {
+            finalstr = expr;
+        }
         let operation = parse(finalstr);
         println!("{}", operation.resolve());
         // Clean variable data
