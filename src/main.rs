@@ -16,8 +16,30 @@ fn has_operations(strexp: String) -> bool {
     }
 }
 
-fn has_parenthesis(strexp: String) -> bool {
-    if strexp.contains("(") || strexp.contains(")") {
+fn has_vanishable_parenthesis(str_to_check: String) -> bool {
+    let mut first_open_par_index: usize = 0;
+    let mut last_close_par_index: usize = 0;
+    let charlist: Vec<char> = str_to_check.clone().chars().collect();
+    let mut got_open_par = false;
+    let mut got_close_par = false;
+    let mut level: usize = 0;
+
+    for index in 0..str_to_check.len() {
+        // println!("Iter Start Value: {} Level: {} GF: {} GS: {}", charlist[index], level, got_open_par, got_close_par);
+        if !got_open_par && charlist[index] == '(' {
+            first_open_par_index = index;
+            got_open_par = true;
+        } else if charlist[index] == ')' && level == 0 && !got_close_par {
+            last_close_par_index = index;
+            got_close_par = true;
+        } else if charlist[index] == '(' {
+            level += 1;
+        } else if charlist[index] == ')' {
+            level -= 1;
+        }
+    }
+
+    if first_open_par_index == 0 && last_close_par_index == str_to_check.len() - 1 {
         return true;
     } else {
         return false;
@@ -115,7 +137,7 @@ impl Operation {
 fn parse(strexp: String) -> Operation {
     let borrowstr = strexp.clone();
     let borrowstr2 = strexp.clone();
-    if !has_parenthesis(strexp) {
+    if !has_vanishable_parenthesis(strexp) {
         if has_operations(borrowstr2) {
             let mut superior_operation_index: usize = 0;
             let mut superior_operation_type = OperationType::Number;
@@ -159,90 +181,12 @@ fn parse(strexp: String) -> Operation {
             };
         }
     } else {
-        let mut first_open_par_index: usize = 0;
-        let mut last_close_par_index: usize = 0;
-        let charlist: Vec<char> = borrowstr.clone().chars().collect();
-        let mut got_open_par = false;
-
-        for index in 0..borrowstr.len() {
-            if !got_open_par {
-                if charlist[index] == '(' {
-                    first_open_par_index = index;
-                    got_open_par = true;
-                } else if charlist[index] == ')' {
-                    last_close_par_index = index;
-                }
-            }
+        let char_list: Vec<char> = borrowstr2.clone().chars().collect();
+        let mut new_str = "".to_string();
+        for index in 1..char_list.len() - 1 {
+            new_str.push(char_list[index]);
         }
-
-        let mut first_operation_str = "".to_string();
-        let mut second_operation_str = "".to_string();
-        let mut third_operation_str = "".to_string();
-
-        if first_open_par_index != 0 {
-            for index in 0..first_open_par_index - 1 {
-                first_operation_str.push(charlist[index]);
-            }
-        }
-
-        for index in first_open_par_index + 1..last_close_par_index {
-            second_operation_str.push(charlist[index]);
-        }
-
-        if last_close_par_index + 2 < borrowstr.len() {
-            for index in last_close_par_index + 2..borrowstr.len() {
-                third_operation_str.push(charlist[index]);
-            }
-        }
-
-        if first_operation_str != "".to_string()
-            && second_operation_str != "".to_string()
-            && third_operation_str != "".to_string()
-        {
-            let mut first_oper_type = to_operation(charlist[first_open_par_index - 1]);
-            let mut second_oper_type = to_operation(charlist[last_close_par_index + 1]);
-            if !is_superior_than_first(first_oper_type.clone(), second_oper_type.clone()) {
-                // Operation 1 is the superior
-
-                let oper_to_embed = Operation {
-                    first: Some(Box::new(parse(second_operation_str))),
-                    operation: second_oper_type,
-                    second: Some(Box::new(parse(third_operation_str))),
-                    value: 0.0,
-                };
-
-                return Operation {
-                    first: Some(Box::new(parse(first_operation_str))),
-                    operation: first_oper_type,
-                    second: Some(Box::new(oper_to_embed)),
-                    value: 0.0,
-                };
-            } else {
-                // Operation 2 is the superior
-
-                let oper_to_embed = Operation {
-                    first: Some(Box::new(parse(first_operation_str))),
-                    operation: first_oper_type,
-                    second: Some(Box::new(parse(second_operation_str))),
-                    value: 0.0,
-                };
-
-                return Operation {
-                    first: Some(Box::new(oper_to_embed)),
-                    operation: second_oper_type,
-                    second: Some(Box::new(parse(third_operation_str))),
-                    value: 0.0,
-                };
-            }
-        }
-
-        // TODO: Remove this
-        return Operation {
-            first: None,
-            operation: OperationType::Number,
-            second: None,
-            value: borrowstr.parse::<f32>().unwrap(),
-        };
+        return parse(new_str);
     }
 }
 
