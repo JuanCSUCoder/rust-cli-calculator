@@ -38,8 +38,7 @@ fn has_vanishable_parenthesis(str_to_check: String) -> bool {
             level -= 1;
         }
     }
-
-    if first_open_par_index == 0 && last_close_par_index == str_to_check.len() - 1 {
+    if first_open_par_index == 0 && last_close_par_index == str_to_check.len() - 1 && str_to_check.len() != 1{
         return true;
     } else {
         return false;
@@ -141,16 +140,21 @@ fn parse(strexp: String) -> Operation {
         if has_operations(borrowstr2) {
             let mut superior_operation_index: usize = 0;
             let mut superior_operation_type = OperationType::Number;
+            let mut level: usize = 0;
             let charlist: Vec<char> = borrowstr.clone().chars().collect();
             for index in 0..borrowstr.len() {
                 if has_operations(charlist[index].to_string())
                     && is_superior_than_first(
                         superior_operation_type.clone(),
                         to_operation(charlist[index]),
-                    )
+                    ) && level == 0
                 {
                     superior_operation_index = index;
                     superior_operation_type = to_operation(charlist[index]);
+                } else if charlist[index] == '(' {
+                    level += 1;
+                } else if charlist[index] == ')' {
+                    level -= 1;
                 }
             }
 
