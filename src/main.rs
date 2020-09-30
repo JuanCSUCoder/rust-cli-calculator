@@ -8,7 +8,11 @@ fn welcome() {
 }
 
 fn has_operations(strexp: String) -> bool {
-    if strexp.contains("+") || strexp.contains("-") || strexp.contains("*") || strexp.contains("/")
+    if strexp.contains("+")
+        || strexp.contains("-")
+        || strexp.contains("*")
+        || strexp.contains("/")
+        || strexp.contains("^")
     {
         return true;
     } else {
@@ -39,7 +43,7 @@ fn has_vanishable_parenthesis(str_to_check: String) -> bool {
         }
     }
 
-    if first_open_par_index == 0 && last_close_par_index == str_to_check.len() - 1 {
+    if first_open_par_index == 0 && last_close_par_index == str_to_check.len() - 1 && str_to_check.len() != 1 {
         return true;
     } else {
         return false;
@@ -52,6 +56,7 @@ fn to_operation(charvar: char) -> OperationType {
         '-' => return OperationType::Substract,
         '*' => return OperationType::Multiply,
         '/' => return OperationType::Divide,
+        '^' => return OperationType::Power,
         _ => {
             println!("Unknown operation. Write better code xd");
             return OperationType::Number;
@@ -61,19 +66,21 @@ fn to_operation(charvar: char) -> OperationType {
 
 fn is_superior_than_first(type1: OperationType, type2: OperationType) -> bool {
     let type1_number = match type1 {
-        OperationType::Number => 0,
+        OperationType::Number => -1,
         OperationType::Add => 4,
         OperationType::Substract => 3,
         OperationType::Multiply => 2,
         OperationType::Divide => 1,
+        OperationType::Power => 0,
     };
 
     let type2_number = match type2 {
-        OperationType::Number => 0,
+        OperationType::Number => -1,
         OperationType::Add => 4,
         OperationType::Substract => 3,
         OperationType::Multiply => 2,
         OperationType::Divide => 1,
+        OperationType::Power => 0,
     };
 
     if type2_number > type1_number {
@@ -88,6 +95,7 @@ enum OperationType {
     Substract,
     Multiply,
     Divide,
+    Power,
     Number,
 }
 
@@ -98,6 +106,7 @@ impl Clone for OperationType {
             OperationType::Substract => OperationType::Substract,
             OperationType::Multiply => OperationType::Multiply,
             OperationType::Divide => OperationType::Divide,
+            OperationType::Power => OperationType::Power,
             OperationType::Number => OperationType::Number,
         }
     }
@@ -130,6 +139,14 @@ impl Operation {
                 return self.first.as_ref().unwrap().resolve()
                     / self.second.as_ref().unwrap().resolve()
             }
+            OperationType::Power => {
+                return self
+                    .first
+                    .as_ref()
+                    .unwrap()
+                    .resolve()
+                    .powf(self.second.as_ref().unwrap().resolve());
+            }
         }
     }
 }
@@ -141,6 +158,7 @@ fn parse(strexp: String) -> Operation {
         if has_operations(borrowstr2) {
             let mut superior_operation_index: usize = 0;
             let mut superior_operation_type = OperationType::Number;
+            let mut level: usize = 0;
             let charlist: Vec<char> = borrowstr.clone().chars().collect();
             for index in 0..borrowstr.len() {
                 if has_operations(charlist[index].to_string())
@@ -148,9 +166,14 @@ fn parse(strexp: String) -> Operation {
                         superior_operation_type.clone(),
                         to_operation(charlist[index]),
                     )
+                    && level == 0
                 {
                     superior_operation_index = index;
                     superior_operation_type = to_operation(charlist[index]);
+                } else if charlist[index] == '(' {
+                    level += 1;
+                } else if charlist[index] == ')' {
+                    level -= 1;
                 }
             }
 
